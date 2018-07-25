@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /*
-  Sample Chaincode based on Demonstrated Scenario
-
+ Author: Sherry
+ Time: 2018 
  This code is based on code written by the Hyperledger Fabric community.
-  Original code can be found here: https://github.com/hyperledger/fabric-samples/blob/release/chaincode/fabcar/fabcar.go
- */
+*/
 
 package main
 
 /* Imports  
 * 4 utility libraries for handling bytes, reading and writing JSON, 
-formatting, and string manipulation  
+  formatting, and string manipulation  
 * 2 specific Hyperledger Fabric specific libraries for Smart Contracts  
 */ 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json" //???
 	"fmt"
 	"strconv"
 
@@ -40,7 +39,7 @@ type Box struct {
 
 /*
  * The Init method *
- called when the Smart Contract "tuna-chaincode" is instantiated by the network
+ called when the Smart Contract "TurnoverCh-chaincode" is instantiated by the *network*
  * Best practice is to have any Ledger initialization in separate function 
  -- see initLedger()
  */
@@ -50,7 +49,7 @@ func (s *SmartContract) Init(APIstub shim.ChaincodeStubInterface) sc.Response {
 
 /*
  * The Invoke method *
- called when an application requests to run the Smart Contract "tuna-chaincode"
+ called when an application requests to run the Smart Contract "TurnoverBox-chaincode"
  The app also specifies the specific smart contract function to call with args
  */
 func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -58,16 +57,16 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	// Retrieve the requested Smart Contract function and arguments
 	function, args := APIstub.GetFunctionAndParameters()
 	// Route to the appropriate handler function to interact with the ledger
-	if function == "queryTuna" {
-		return s.queryTuna(APIstub, args)
+	if function == "queryBox" {
+		return s.queryBox(APIstub, args)
 	} else if function == "initLedger" {
 		return s.initLedger(APIstub)
-	} else if function == "recordTuna" {
-		return s.recordTuna(APIstub, args)
-	} else if function == "queryAllTuna" {
-		return s.queryAllTuna(APIstub)
-	} else if function == "changeTunaHolder" {
-		return s.changeTunaHolder(APIstub, args)
+	} else if function == "addBox" {
+		return s.addBox(APIstub, args)
+	} else if function == "queryAllBox" {
+		return s.queryAllBox(APIstub)
+	} else if function == "RefuelFee" {
+		return s.RefuelFee(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -93,26 +92,21 @@ func (s *SmartContract) queryBox(APIstub shim.ChaincodeStubInterface, args []str
 
 /*
  * The initLedger method *
-Will add test data (10 tuna catches)to our network
+Will add test data to our network
+this method is only temporarily
  */
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
-	tuna := []Tuna{
-		Tuna{Vessel: "923F", Location: "67.0006, -70.5476", Timestamp: "1504054225", Holder: "Miriam"},
-		Tuna{Vessel: "M83T", Location: "91.2395, -49.4594", Timestamp: "1504057825", Holder: "Dave"},
-		Tuna{Vessel: "T012", Location: "58.0148, 59.01391", Timestamp: "1493517025", Holder: "Igor"},
-		Tuna{Vessel: "P490", Location: "-45.0945, 0.7949", Timestamp: "1496105425", Holder: "Amalea"},
-		Tuna{Vessel: "S439", Location: "-107.6043, 19.5003", Timestamp: "1493512301", Holder: "Rafa"},
-		Tuna{Vessel: "J205", Location: "-155.2304, -15.8723", Timestamp: "1494117101", Holder: "Shen"},
-		Tuna{Vessel: "S22L", Location: "103.8842, 22.1277", Timestamp: "1496104301", Holder: "Leila"},
-		Tuna{Vessel: "EI89", Location: "-132.3207, -34.0983", Timestamp: "1485066691", Holder: "Yuan"},
-		Tuna{Vessel: "129R", Location: "153.0054, 12.6429", Timestamp: "1485153091", Holder: "Carlo"},
-		Tuna{Vessel: "49W4", Location: "51.9435, 8.2735", Timestamp: "1487745091", Holder: "Fatima"},
+	boxes := []Box{
+		Box{Owner: "Operator", Start: "20180314001", Type: "Box-N", End "INF"},
+		Box{Owner: "Operator", Start: "20180314002", Type: "Box-N", End "INF"},
+		Box{Owner: "Supplier", Start: "20180314001", Type: "Box-A", End "20180621002"},
+		Box{Owner: "Distributer", Start: "20180714001", Type: "Box-N", End "20180921002"}		
 	}
 
 	i := 0
-	for i < len(tuna) {
+	for i < len(boxes) {
 		fmt.Println("i is ", i)
-		tunaAsBytes, _ := json.Marshal(tuna[i])
+		tunaAsBytes, _ := json.Marshal(boxes[i])
 		APIstub.PutState(strconv.Itoa(i+1), tunaAsBytes)
 		fmt.Println("Added", tuna[i])
 		i = i + 1
@@ -121,30 +115,33 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	return shim.Success(nil)
 }
 
-/*
- * The recordTuna method *
-Fisherman like Sarah would use to record each of her tuna catches. 
-This method takes in five arguments (attributes to be saved in the ledger). 
+	/*
+	 * The addBox method *
+The Box operator will add new turnover boxes into the network
+
  */
 func (s *SmartContract) addBox(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 5 {
 		return shim.Error("Incorrect number of arguments. Expecting 5")
 	}
+    if args[1] != "Operator"{
+    	return shim.Error("The Only Operator can add Boxes")
 
-	var tuna = Tuna{ Vessel: args[1], Location: args[2], Timestamp: args[3], Holder: args[4] }
+    }
+	var box = Box{ Owner: args[1], Start: args[2], Type: args[3], End: args[4] }
 
-	tunaAsBytes, _ := json.Marshal(tuna)
+	boxAsBytes, _ := json.Marshal(box)
 	err := APIstub.PutState(args[0], tunaAsBytes)
 	if err != nil {
-		return shim.Error(fmt.Sprintf("Failed to record tuna catch: %s", args[0]))
+		return shim.Error(fmt.Sprintf("Failed to add box record : %s", args[0]))
 	}
 
 	return shim.Success(nil)
 }
 
 /*
- * The queryAllTuna method *
+ * The queryAllBox method *
 allows for assessing all the records added to the ledger(all tuna catches)
 This method does not take any arguments. Returns JSON string containing results. 
  */
@@ -192,11 +189,11 @@ func (s *SmartContract) queryAllBox(APIstub shim.ChaincodeStubInterface) sc.Resp
 }
 
 /*
- * The changeTunaHolder method *
+ * The RefuelFee method *
 The data in the world state can be updated with who has possession. 
 This function takes in 2 arguments, tuna id and new holder name. 
  */
-func (s *SmartContract) changeTunaHolder(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) RefuelFee(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
