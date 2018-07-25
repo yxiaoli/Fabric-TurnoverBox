@@ -27,14 +27,21 @@ import (
 type SmartContract struct {
 }
 
-/* Define Tuna structure, with 4 properties.  
+/* Define Box structure, with 4 properties.  
 Structure tags are used by encoding/json library
 */
 type Box struct {
-	Owner string `json:"vessel"`
+	Owner string `json:"name"`
 	Start string `json:"S_timestamp"`
 	Type string `json:"Type"`
 	End string `json:"E_timestamp"`
+}
+
+/* Define Cash/Coin structure, with only one property.  
+Structure tags are used by encoding/json library
+*/
+type Coin struct{
+	Owner string `json:"name"`
 }
 
 /*
@@ -73,7 +80,7 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 }
 
 /*
- * The queryTuna method *
+ * The queryBox method *
 Used to view the records of one particular tuna
 It takes one argument -- the key for the tuna in question
  */
@@ -100,18 +107,27 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 		Box{Owner: "Operator", Start: "20180314001", Type: "Box-N", End "INF"},
 		Box{Owner: "Operator", Start: "20180314002", Type: "Box-N", End "INF"},
 		Box{Owner: "Supplier", Start: "20180314001", Type: "Box-A", End "20180621002"},
-		Box{Owner: "Distributer", Start: "20180714001", Type: "Box-N", End "20180921002"}		
+		Box{Owner: "Distributor", Start: "20180714001", Type: "Box-N", End "20180921002"}		
 	}
-
+    coins := []COIN{
+    	Coin{Owner: "Supplier"},
+    	Coin{Owner: "Supplier"},
+  	 	Coin{Owner: "Distributor"}
+    	Coin{Owner: "Retailer"}
+   
+    }
 	i := 0
 	for i < len(boxes) {
 		fmt.Println("i is ", i)
 		tunaAsBytes, _ := json.Marshal(boxes[i])
+		coinAsBytes, _ := json.Marshal(coins[i])		
 		APIstub.PutState(strconv.Itoa(i+1), tunaAsBytes)
-		fmt.Println("Added", tuna[i])
+		APIstub.PutState(strconv.Itoa(i+1), coinAsBytes)
+		fmt.Println("Added", tuna[i], coins[i])
 		i = i + 1
 	}
 
+     
 	return shim.Success(nil)
 }
 
