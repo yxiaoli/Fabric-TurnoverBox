@@ -15,7 +15,7 @@ package main
 */ 
 import (
 	"bytes"
-	"encoding/json" //???
+	"encoding/json" //
 	"fmt"
 	"strconv"
 
@@ -72,8 +72,10 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.addBox(APIstub, args)
 	} else if function == "queryAllBox" {
 		return s.queryAllBox(APIstub)
-	} else if function == "RefuelFee" {
-		return s.RefuelFee(APIstub, args)
+	} else if function == "refuelFee" {
+		return s.refuelFee(APIstub, args)
+	} else if function == "depositCoin" {
+		return s.depositCoin(APIstub, args)
 	}
 
 	return shim.Error("Invalid Smart Contract function name.")
@@ -131,7 +133,7 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 	return shim.Success(nil)
 }
 
-	/*
+/*
 	 * The addBox method *
 The Box operator will add new turnover boxes into the network
 
@@ -206,10 +208,11 @@ func (s *SmartContract) queryAllBox(APIstub shim.ChaincodeStubInterface) sc.Resp
 
 /*
  * The RefuelFee method *
-The data in the world state can be updated with who has possession. 
-This function takes in 2 arguments, tuna id and new holder name. 
+ The supplier should pay for the
+//The data in the world state can be updated with who has possession. 
+//This function takes in 2 arguments, tuna id and new holder name. 
  */
-func (s *SmartContract) RefuelFee(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *SmartContract) refuelFee(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
@@ -235,6 +238,32 @@ func (s *SmartContract) RefuelFee(APIstub shim.ChaincodeStubInterface, args []st
 	return shim.Success(nil)
 }
 
+/*
+ *  The depositCoin method *
+ the clients except the operator should deposit some coins
+ in order to pay pledge 
+ the func takes in 2 arguments, owner, num of coins 
+*/
+ 
+func (s *SmartContract) depositCoin(APIstub shim.ChaincodeStubInterface, args []string) sc.Response{
+ 	
+ 	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+    var num = args[1]
+ 
+    for i := 0; i< num; i++ {
+	   var coins = Coin{ Owner: args[0] }
+	   coinAsBytes,_ := json.Marshal(coins)	
+	   err := APIstub.PutState(args[0], coinAsBytes)
+	   if err != nil {
+	   		return shim.Error(fmt.Sprintf("Failed to add box record : %s", args[0]))
+	   }
+	}
+	   
+	return shim.Success(nil)
+}
 /*
  * main function *
 calls the Start function 
