@@ -18,6 +18,8 @@ import (
 	"encoding/json" //
 	"fmt"
 	"strconv"
+    "container/list" 
+    "time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
@@ -31,7 +33,7 @@ type SmartContract struct {
 Structure tags are used by encoding/json library
 */
 type Box struct {
-	Owner string `json:"name"`
+	BOwner string `json:"name"`
 	Start string `json:"S_timestamp"`
 	Type string `json:"Type"`
 	End string `json:"E_timestamp"`
@@ -41,7 +43,7 @@ type Box struct {
 Structure tags are used by encoding/json library
 */
 type Coin struct{
-	Owner string `json:"name"`
+	COwner string `json:"name"`
 }
 
 /*
@@ -106,16 +108,16 @@ this method is only temporarily
  */
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
 	boxes := []Box{
-		Box{Owner: "Operator", Start: "20180314001", Type: "Box-N", End "INF"},
-		Box{Owner: "Operator", Start: "20180314002", Type: "Box-N", End "INF"},
-		Box{Owner: "Supplier", Start: "20180314001", Type: "Box-A", End "20180621002"},
-		Box{Owner: "Distributor", Start: "20180714001", Type: "Box-N", End "20180921002"}		
+		Box{BOwner: "Operator", Start: "20180314001", Type: "Box-N", End "INF"},
+		Box{BOwner: "Operator", Start: "20180314002", Type: "Box-N", End "INF"},
+		Box{BOwner: "Supplier", Start: "20180314001", Type: "Box-A", End "20180621002"},
+		Box{BOwner: "Distributor", Start: "20180714001", Type: "Box-N", End "20180921002"}		
 	}
     coins := []COIN{
-    	Coin{Owner: "Supplier"},
-    	Coin{Owner: "Supplier"},
-  	 	Coin{Owner: "Distributor"}
-    	Coin{Owner: "Retailer"}
+    	Coin{COwner: "Supplier"},
+    	Coin{COwner: "Supplier"},
+  	 	Coin{COwner: "Distributor"}
+    	Coin{COwner: "Retailer"}
    
     }
 	i := 0
@@ -207,10 +209,9 @@ func (s *SmartContract) queryAllBox(APIstub shim.ChaincodeStubInterface) sc.Resp
 }
 
 /*
- * The RefuelFee method *
+ * The refuelFee method *
  The supplier should pay for the
-//The data in the world state can be updated with who has possession. 
-//This function takes in 2 arguments, tuna id and new holder name. 
+//This function takes in 2 arguments, number of boxes and Boxes Type. 
  */
 func (s *SmartContract) refuelFee(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
@@ -218,23 +219,63 @@ func (s *SmartContract) refuelFee(APIstub shim.ChaincodeStubInterface, args []st
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
 
-	tunaAsBytes, _ := APIstub.GetState(args[0])
-	if tunaAsBytes == nil {
-		return shim.Error("Could not locate tuna")
-	}
-	tuna := Tuna{}
-
-	json.Unmarshal(tunaAsBytes, &tuna)
-	// Normally check that the specified argument is a valid holder of tuna
-	// we are skipping this check for this example
-	tuna.Holder = args[1]
-
-	tunaAsBytes, _ = json.Marshal(tuna)
-	err := APIstub.PutState(args[0], tunaAsBytes)
-	if err != nil {
-		return shim.Error(fmt.Sprintf("Failed to change tuna holder: %s", args[0]))
+    Bnum := args[0]
+    Btype := args[1]
+  	queryString_b := fmt.Sprintf("{\"selector\":{\"BOwner\":\"Operator\",\"Type\":\"%s\"}}", Btype)
+  	queryString_c := fmt.Sprintf("{\"selector\":{\"COwner\":\"Supplier\"}}")
+  	
+  	resultsIterator_b, err_b := APIstub.GetQueryResult(queryString_b)
+  	resultsIterator_c, err := APIstub.GetQueryResult(queryString_c)
+    if err_b != nil {
+		return shim.Error(err_b.Error())
 	}
 
+ 	if err_c != nil {
+		return shim.Error(err_c.Error())
+	}
+
+	boxes := list.New()
+	coins := list.New()
+    i := 0
+    t := time.Now()
+	for i < Bnum {
+     
+        if(!resultsIterator_b.HasNext()){
+        	return shim.Error("Insufficient Box, only %d boxe(s) has been pledged",i)
+        }
+
+        if(!resultsIterator_c.HasNext()){
+        	return shim.Error("Insufficient Money, only %d boxe(s) has been pledged",i)
+        }
+	    queryResponse_b, err_b := resultsIterator_b.Next()
+		queryResponse_c, err_c := resultsIterator_c.Next()
+		
+		if err_b != nil {
+			return nil, err_b
+		}
+		if err_c != nil {
+			return nil, err_c
+		}
+        // change the owner of box
+        key_b = queryResponse_b.Key
+        value_b = queryResponse_b.Value
+
+		value_b.Start = t.String()
+		value_b.End = t.AddDate(0,1,0)
+		value_b.Owner = "Supplier"
+       	boxAsBytes, _ = json.Marshal(value_b)
+
+        PutState(key_b, boxAsBytes)
+        //change the owner of coins
+        key_c = queryResponse_c.Key
+        value_c = queryResponse_c.Value
+		value_c.Owner = "Operator"
+       	coinAsBytes, _ = json.Marshal(value_c)
+
+        PutState(key_b, coinAsBytes)        
+		i ++
+	}
+	
 	return shim.Success(nil)
 }
 
@@ -264,6 +305,9 @@ func (s *SmartContract) depositCoin(APIstub shim.ChaincodeStubInterface, args []
 	   
 	return shim.Success(nil)
 }
+
+
+
 /*
  * main function *
 calls the Start function 
