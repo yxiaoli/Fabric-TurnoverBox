@@ -85,8 +85,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 
 /*
  * The queryBox method *
-Used to view the records of one particular tuna
-It takes one argument -- the key for the tuna in question
+Used to view the records of one particular Box
+It takes one argument -- the key for the Box in question
  */
 func (s *SmartContract) queryBox(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
