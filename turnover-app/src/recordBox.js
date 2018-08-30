@@ -15,7 +15,7 @@ var os = require('os');
 
 var fabric_client = new Fabric_Client();
 
-console.log("submit recording of a tuna catch: ");
+console.log("submit recording of a Box: ");
 
 var array = req.params.tuna.split("-");
 

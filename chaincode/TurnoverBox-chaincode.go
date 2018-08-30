@@ -147,7 +147,6 @@ func (s *SmartContract) addBox(APIstub shim.ChaincodeStubInterface, args []strin
 	}
     if args[1] != "Operator"{
     	return shim.Error("The Only Operator can add Boxes")
-
     }
 	var box = Box{ Owner: args[1], Start: args[2], Type: args[3], End: args[4] }
 
@@ -167,8 +166,8 @@ This method does not take any arguments. Returns JSON string containing results.
  */
 func (s *SmartContract) queryAllBox(APIstub shim.ChaincodeStubInterface) sc.Response {
 
-	startKey := "0"
-	endKey := "999"
+	startKey := "000"
+	endKey := "9999999999"
 
 	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
 	if err != nil {

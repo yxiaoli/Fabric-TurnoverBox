@@ -61,6 +61,7 @@
       }
     </style>
   </head>
+
   <body ng-app="application" ng-controller="appController">
     <header>
       <div id="left_header">Hyperledger Fabric TurnoverBox Application</div>
@@ -69,26 +70,26 @@
 
     <div id="body">
       <div class="form-group">
-        <label>Query All Tuna Catches</label>
-        <p><input id="queryAllTuna" type="submit" value="Query" class="btn btn-primary" ng-click="queryAllTuna()"></p>
+        <label>Query All Boxes </label>
+        <p><input id="queryAllTuna" type="submit" value="Query" class="btn btn-primary" ng-click="queryAllBox()"></p>
       </div>
  
       <table id="all_tuna" class="table" align="center">
 
         <tr>
-          <th>ID</th>
-          <th>Timestamp</th>
-          <th>Holder</th>
-          <th>Catch Location <br>(Longitude, Latitude)</th>
-          <th>Vessel</th>
+          <th>Id </th>
+          <th>Owner</th>
+          <th>Start_time</th>
+          <th>Type </th>
+          <th>End_time</th>
         </tr>
 
-        <tr ng-repeat="tuna in all_tuna">
-          <td>{{tuna.Key}}</td>
-          <td>{{tuna.timestamp}}</td>
-          <td>{{tuna.holder}}</td>
-          <td>{{tuna.location}}</td>
-          <td>{{tuna.vessel}}</td>
+        <tr ng-repeat="box in the ledger">
+          <td>{{box.Id}}</td>
+          <td>{{box.owner}}</td>
+          <td>{{box.Start}}</td>
+          <td>{{box.type}}</td>
+          <td>{{box.End}}</td>
         </tr>
       </table>
 
@@ -121,10 +122,10 @@
         <label>Create Box Record</label>
         <h5 style="color:green;margin-bottom:2%" id="success_create">Success! Tx ID: {{create_tuna}}</h5>
         <br>
-        Enter type of box: <input class="form-control" type="text" placeholder="Ex: normal" ng-model="tuna.vessel">
-        Enter end time: <input class="form-control" type="text" placeholder="Ex: inf" ng-model="tuna.timestamp">
-        Enter number of boxes: <input class="form-control" type="text" placeholder="Ex: 10" ng-model="tuna.holder">
-        <input id="createSubmit" type="submit" value="Create" class="btn btn-primary" ng-click="recordTuna()"> 
+        Enter type of box: <input class="form-control" type="text" placeholder="Ex: normal" ng-model="box.type">
+        Enter end time: <input class="form-control" type="text" placeholder="Ex: inf" ng-model="box.End">
+        Enter number of boxes: <input class="form-control" type="text" placeholder="Ex: 10" ng-model="box.num">
+        <input id="createSubmit" type="submit" value="Create" class="btn btn-primary" ng-click="recordBox()"> 
       </div>
 
       <div class="form-group">
