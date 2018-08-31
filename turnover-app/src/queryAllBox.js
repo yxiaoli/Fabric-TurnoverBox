@@ -14,6 +14,8 @@ var path = require('path');
 var util = require('util');
 var os = require('os');
 
+console.log("getting all turnoverbox from database: ");
+
 var fabric_client = new Fabric_Client();
 
 // setup the fabric network
@@ -47,13 +49,12 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
         member_user = user_from_store;
     } else {
         throw new Error('Failed to get user1.... run registerUser.js');
-    }
-
+     }
     // queryAllTuna - requires no arguments , ex: args: [''],
     const request = {
-        chaincodeId: 'turnoverbox-app',
+        chaincodeId: 'turnover-app',
         txId: tx_id,
-        fcn: 'queryAllTuna',
+        fcn: 'queryAllBox',
         args: ['']
     };
 
