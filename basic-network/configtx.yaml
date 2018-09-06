@@ -14,7 +14,9 @@
 ################################################################################
 Profiles:
 
-    OneOrgOrdererGenesis:
+    FourOrgOrdererGenesis:
+        Capabilities:
+            <<: *ChannelCapabilities
         Orderer:
             <<: *OrdererDefaults
             Organizations:
@@ -22,14 +24,20 @@ Profiles:
         Consortiums:
             SampleConsortium:
                 Organizations:
-                    - *Org1
-    OneOrgChannel:
+                    - *Operator
+                    - *Supplier
+                    - *Distributor
+                    - *Retailer
+
+    TwoOrgChannel:
         Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Org1
-
+                - *Operator
+                - *Supplier
+                - *Distributor
+                - *Retailer
 ################################################################################
 #
 #   Section: Organizations
@@ -53,21 +61,73 @@ Organizations:
         # MSPDir is the filesystem path which contains the MSP configuration
         MSPDir: crypto-config/ordererOrganizations/example.com/msp
 
-    - &Org1
+    - &Operator
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org1MSP
+        Name: OperatorMSP
 
         # ID to load the MSP definition as
-        ID: Org1MSP
+        ID: OperatorMSP
 
-        MSPDir: crypto-config/peerOrganizations/org1.example.com/msp
+        MSPDir: crypto-config/peerOrganizations/Operator.example.com/msp
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.org1.example.com
+            - Host: peer0.Operator.example.com
+              Port: 7051
+
+    - &Supplier
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: SupplierMSP
+
+        # ID to load the MSP definition as
+        ID: SupplierMSP
+
+        MSPDir: crypto-config/peerOrganizations/Supplier.example.com/msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: peer0.Supplier.example.com
+              Port: 7051
+
+
+    - &Distributor
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: DistributorMSP
+
+        # ID to load the MSP definition as
+        ID: DistributorMSP
+
+        MSPDir: crypto-config/peerOrganizations/Distributor.example.com/msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: peer0.Distributor.example.com
+              Port: 7051
+
+    - &Retailer
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: RetailerMSP
+
+        # ID to load the MSP definition as
+        ID: RetailerMSP
+
+        MSPDir: crypto-config/peerOrganizations/Retailer.example.com/msp
+
+        AnchorPeers:
+            # AnchorPeers defines the location of peers which can be used
+            # for cross org gossip communication.  Note, this value is only
+            # encoded in the genesis block in the Application section context
+            - Host: peer0.Retailer.example.com
               Port: 7051
 
 ################################################################################
