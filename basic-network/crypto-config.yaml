@@ -60,7 +60,7 @@ PeerOrgs:
     # name collisions
     # ---------------------------------------------------------------------------
     Template:
-      Count: 2
+      Count: 1
       # Start: 5
       # Hostname: {{.Prefix}}{{.Index}} # default
     # ---------------------------------------------------------------------------
@@ -76,16 +76,16 @@ PeerOrgs:
   - Name: Supplier
     Domain: Supplier.example.com
     Template:
-      Count: 2
+      Count: 1
     Users:
       Count: 1
   # ---------------------------------------------------------------------------
   # Org3: See "Org1" for full specification
   # ---------------------------------------------------------------------------
   - Name: Distributor 
-    Domain: distributor.example.com
+    Domain: Distributor.example.com
     Template:
-      Count: 2
+      Count: 1
     Users:
       Count: 1
   # ---------------------------------------------------------------------------
@@ -94,6 +94,6 @@ PeerOrgs:
   - Name: Retailer 
     Domain: Retailer.example.com
     Template:
-      Count: 2
+      Count: 1
     Users:
       Count: 1
