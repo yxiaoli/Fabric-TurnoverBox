@@ -4,13 +4,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-export PATH=$GOPATH/src/github.com/hyperledger/fabric/build/bin:${PWD}/../bin:${PWD}:$PATH
-export FABRIC_CFG_PATH=${PWD}
+#export PATH=$GOPATH/src/github.com/hyperledger/fabric/build/bin:${PWD}/../bin:${PWD}:$PATH
+#export FABRIC_CFG_PATH=${PWD}
 # export PATH=/home/sherry/Code/fabric-samples/bin:$PATH
 CHANNEL_NAME=mychannel
 
+docker-compose -f docker-compose-cli.yaml down --volumes --remove-orphans
+docker rm -f $(docker ps -aq)
 # remove previous crypto material and config transactions
-rm -fr channel-artifact/*
+rm -fr channel-artifacts/*
 rm -fr crypto-config/*
 
 # generate crypto material
@@ -21,7 +23,8 @@ if [ "$?" -ne 0 ]; then
 fi
 
 # generate genesis block for orderer
-export PATH=/home/sherry/Code/fabric-samples/bin:$PATH
+#export PATH=/home/sherry/Code/fabric-samples/bin:$PATH
+export FABRIC_CFG_PATH=${PWD}
 configtxgen -profile FourOrgOrdererGenesis -outputBlock ./channel-artifacts/genesis.block
 if [ "$?" -ne 0 ]; then
   echo "Failed to generate orderer genesis block..."

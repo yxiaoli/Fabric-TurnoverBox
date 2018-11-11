@@ -13,7 +13,7 @@ services:
 
   orderer.example.com:
     extends:
-      file:   base/docker-compose-base.yaml
+      file:   docker-compose-base.yaml
       service: orderer.example.com
     container_name: orderer.example.com
     #--------change---------
@@ -23,7 +23,7 @@ services:
   peer0.Operator.example.com:
     container_name: peer0.Operator.example.com
     extends:
-      file:  base/docker-compose-base.yaml
+      file:  docker-compose-base.yaml
       service: peer0.Operator.example.com
     networks:
       - basic
@@ -31,7 +31,7 @@ services:
   peer0.Supplier.example.com:
     container_name: peer0.Supplier.example.com
     extends:
-      file:  base/docker-compose-base.yaml
+      file:  docker-compose-base.yaml
       service: peer0.Supplier.example.com
     networks:
       - basic
@@ -39,7 +39,7 @@ services:
   peer0.Distributor.example.com:
     container_name: peer0.Distributor.example.com
     extends:
-      file:  base/docker-compose-base.yaml
+      file:  docker-compose-base.yaml
       service: peer0.Distributor.example.com
     networks:
       - basic
@@ -47,7 +47,7 @@ services:
   peer0.Retailer.example.com:
     container_name: peer0.Retailer.example.com
     extends:
-      file:  base/docker-compose-base.yaml
+      file:  docker-compose-base.yaml
       service: peer0.Retailer.example.com
     networks:
       - basic
@@ -67,10 +67,10 @@ services:
       - CORE_PEER_LOCALMSPID=OperatorMSP
       - CORE_PEER_TLS_ENABLED=true
       # ---CHANGED--- changed to reflect peer0 name, org1 name and our company's domain
-      - CORE_PEER_TLS_CERT_FILE=/home/sherry/Code/Fabric-TurnoverBox/basic-network/crypto-config/peerOrganizations/Operator.example.com/peers/peer0.Operator.example.com/tls/server.crt
-      - CORE_PEER_TLS_KEY_FILE=/home/sherry/Code/Fabric-TurnoverBox/basic-network/crypto-config/peerOrganizations/Operator.example.com/peers/peer0.Operator.example.com/tls/server.key
-      - CORE_PEER_TLS_ROOTCERT_FILE=/home/sherry/Code/Fabric-TurnoverBox/basic-network/crypto-config/peerOrganizations/Operator.example.com/peers/peer0.Operator.example.com/tls/ca.crt
-      - CORE_PEER_MSPCONFIGPATH=/home/sherry/Code/Fabric-TurnoverBox/basic-network/crypto-config/peerOrganizations/Operator.example.com/users/Admin@Operator.example.com/msp
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/Operator.example.com/peers/peer0.Operator.example.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/Operator.example.com/peers/peer0.Operator.example.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/Operator.example.com/peers/peer0.Operator.example.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/Operator.example.com/users/Admin@Operator.example.com/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     # ---CHANGED--- command needs to be connected out as we will be issuing commands explicitly, not using by any script
     # command: /bin/bash -c './scripts/script.sh ${CHANNEL_NAME}; sleep $TIMEOUT'
